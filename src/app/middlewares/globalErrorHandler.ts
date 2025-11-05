@@ -8,6 +8,8 @@ const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFun
     let message = err.message || "Something went wrong!";
     let error = err;
 
+    console.log(error);
+
     res.status(statusCode).json({
         success,
         message,
