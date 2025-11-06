@@ -11,7 +11,7 @@ const createPatient = async (req: Request) => {
         req.body.patient.profilePhoto = uploadedResult?.secure_url;
     }
 
-    const hashPassword = await bcrypt.hash(req.body.password, Number(config.BCRYPT_SALT));
+    const hashPassword = await bcrypt.hash(req.body.password, Number(config.bcrypt_salt_rounds));
 
     const result = await prisma.$transaction(async (tnx) => {
         await tnx.user.create({
