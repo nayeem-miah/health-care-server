@@ -4,4 +4,6 @@
 * bun dev --> start server
 
 ** install prisma, prisma client , prisma init ,create model and migrate , query
-* multiple files in prisma schema and again migrate dev
+* multiple files in prisma schema and again migrate dev and query
+
+//* file upload ---> cloudinary and multer
