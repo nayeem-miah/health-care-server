@@ -7,3 +7,7 @@
 * multiple files in prisma schema and again migrate dev and query
 
 //* file upload ---> cloudinary and multer
+multer ---> copy multer code 
+cloudinary ---> copy cloudinary code and change key
+
+// login --> bcrypt --> jwt-->
