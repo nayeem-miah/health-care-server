@@ -35,13 +35,27 @@ const createDoctor = catchAsync(async (req: Request, res: Response) => {
         message: "Doctor created successfully",
         data: result
     })
-})
+});
 
+// * * ?page=1&limit=10&searchTerm="email searching" 
+const getAllFRomDB = catchAsync(async (req: Request, res: Response) => {
+    const { page, limit, searchTerm, sortBy, sortOrder } = req.query;
+
+    const result = await UserService.getAllFRomDB({ page: Number(page), limit: Number(limit), searchTerm, sortBy, sortOrder });
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "gel all user successfully",
+        data: result
+    })
+})
 
 
 
 export const UserController = {
     createPatient,
     createAdmin,
-    createDoctor
+    createDoctor,
+    getAllFRomDB
 }

@@ -5,6 +5,8 @@ import { userValidation } from "./user.validation";
 
 const router = express.Router();
 
+router.get("/", UserController.getAllFRomDB)
+
 router.post(
     "/create-patient",
     fileUploader.upload.single("file"), // uploading file
