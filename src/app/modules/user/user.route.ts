@@ -2,10 +2,16 @@ import express, { NextFunction, Request, Response } from "express";
 import { UserController } from "./user.controller";
 import { fileUploader } from "../../helpers/fileUpload";
 import { userValidation } from "./user.validation";
+import { UserRole } from "@prisma/client";
+import auth from "../../middlewares/auth";
 
 const router = express.Router();
 
-router.get("/", UserController.getAllFRomDB)
+router.get(
+    "/",
+    auth(UserRole.ADMIN),
+    UserController.getAllFRomDB
+)
 
 router.post(
     "/create-patient",
