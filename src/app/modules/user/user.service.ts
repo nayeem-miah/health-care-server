@@ -123,7 +123,10 @@ const getAllFRomDB = async (params: any, options: IOptions) => {
             }))
         })
     }
-    console.log({ andConditions });
+
+    const whereConditions: Prisma.UserWhereInput = andConditions.length > 0 ? { AND: andConditions } : {};
+
+
     const result = await prisma.user.findMany({
 
         // ? pagination
@@ -131,16 +134,26 @@ const getAllFRomDB = async (params: any, options: IOptions) => {
         take: limit,
 
         //? searching && filtering
-        where: {
-            AND: andConditions
-        },
-
+        where: whereConditions,
         // ? sorting
         orderBy: {
             [sortBy]: sortOrder
         }
     });
-    return result
+
+    const total = await prisma.user.count({
+        where: whereConditions
+    })
+
+
+    return {
+        meta: {
+            page,
+            limit,
+            total
+        },
+        data: result
+    }
 }
 
 
