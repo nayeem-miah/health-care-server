@@ -11,3 +11,6 @@ multer ---> copy multer code
 cloudinary ---> copy cloudinary code and change key
 
 // login --> bcrypt --> jwt-->
+
+ //* admin , doctor , patient -----> create
+  // get all user --> filtering , pagination, sorting, searching

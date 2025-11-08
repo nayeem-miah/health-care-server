@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import catchAsync from "../../shared/catchAsync";
 import { UserService } from "./user.service";
 import sendResponse from "../../shared/sendResponse";
+import pick from "../../helpers/pick";
 
 
 const createPatient = catchAsync(async (req: Request, res: Response) => {
@@ -39,9 +40,15 @@ const createDoctor = catchAsync(async (req: Request, res: Response) => {
 
 // * * ?page=1&limit=10&searchTerm="email searching" 
 const getAllFRomDB = catchAsync(async (req: Request, res: Response) => {
-    const { page, limit, searchTerm, sortBy, sortOrder } = req.query;
+    //  page, limit, sortBy, sortOrder ---> pagination, sorting
+    //  fields, searchTerm --> searching , filtering
+    const filters = pick(req.query, ["status", "role", "email", "searchTerm"])
+    const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"])
 
-    const result = await UserService.getAllFRomDB({ page: Number(page), limit: Number(limit), searchTerm, sortBy, sortOrder });
+
+
+    // const { page, limit, searchTerm, sortBy, sortOrder, role, status } = req.query;
+    const result = await UserService.getAllFRomDB(filters, options);
 
     sendResponse(res, {
         statusCode: 200,

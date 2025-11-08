@@ -3,7 +3,9 @@ import { Request } from "express";
 import config from "../../../config";
 import { fileUploader } from "../../helpers/fileUpload";
 import { prisma } from "../../shared/prisma";
-import { Admin, Doctor, UserRole } from "@prisma/client";
+import { Admin, Doctor, Prisma, UserRole } from "@prisma/client";
+import { IOptions, paginationHelper } from "../../helpers/paginationHelpers";
+import { userSearchableFields } from "./user.constant";
 
 
 const createPatient = async (req: Request) => {
@@ -93,38 +95,50 @@ const createDoctor = async (req: Request): Promise<Doctor> => {
     return result;
 };
 
-const getAllFRomDB = async (
-    { page, limit, searchTerm, sortBy, sortOrder
-    }: {
-        page: number,
-        limit: number,
-        searchTerm?: any,
-        sortBy: any,
-        sortOrder: any
-    }) => {
-    const pageNumber = page || 1;
-    const limitNumber = limit || 10
-    const skip = (pageNumber - 1) * limitNumber;
+const getAllFRomDB = async (params: any, options: IOptions) => {
+    const { page, limit, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(options)
+    const { searchTerm, ...filterData } = params;
 
+    const andConditions: Prisma.UserWhereInput[] = [];
 
+    // * searching
+    if (searchTerm) {
+        andConditions.push({
+            OR: userSearchableFields.map(field => ({
+                [field]: {
+                    contains: searchTerm,
+                    mode: "insensitive"
+                }
+            }))
+        })
+    };
+
+    // * filtering
+    if (Object.keys(filterData.length > 0)) {
+        andConditions.push({
+            AND: Object.keys(filterData).map(key => ({
+                [key]: {
+                    equals: (filterData as any)[key]
+                }
+            }))
+        })
+    }
+    console.log({ andConditions });
     const result = await prisma.user.findMany({
 
         // ? pagination
         skip,
-        take: limitNumber,
+        take: limit,
 
-        //? searching
+        //? searching && filtering
         where: {
-            email: {
-                contains: searchTerm,
-                mode: "insensitive"
-            }
+            AND: andConditions
         },
 
         // ? sorting
-        orderBy: sortBy && sortOrder ? {
+        orderBy: {
             [sortBy]: sortOrder
-        } : { createdAt: "desc" }
+        }
     });
     return result
 }
