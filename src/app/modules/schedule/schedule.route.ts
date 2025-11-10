@@ -3,6 +3,13 @@ import { ScheduleController } from "./schedule.controller";
 
 const router = Router();
 
+
+router.get(
+    "/",
+    ScheduleController.scheduleForDoctor
+)
+
+
 router.post(
     "/",
     ScheduleController.insertIntoDB
