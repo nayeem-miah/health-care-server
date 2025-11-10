@@ -18,3 +18,6 @@ cloudinary ---> copy cloudinary code and change key
 
 // create doctor schedules-----*
 * formate date -----> data fns
+
+// get schedules --> implement pagination, filtering, sorting
+// delete schedules 
