@@ -17,7 +17,6 @@ cloudinary ---> copy cloudinary code and change key
 // get cookie ----> using cookie parser get all user 
 
 // create doctor schedules-----*
-* formate date -----> data fns
-
+* format date -----> data fns
 // get schedules --> implement pagination, filtering, sorting
 // delete schedules 
