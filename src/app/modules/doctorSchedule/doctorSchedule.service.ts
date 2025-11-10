@@ -18,7 +18,20 @@ const insertIntoDB = async (user: IJwtPayload, payload: {
     })
 }
 
+const getAllDoctorSchedule = async () => {
+    const result = await prisma.doctorSchedules.findMany();
+    return result
+}
+
+// const updateDoctorSchedule = async (payload: any, scheduleId: string) => {
+//     const result = await prisma.doctorSchedules.update({
+//         where: { scheduleId},
+//         data: payload
+//     });
+//     return result
+// }
 
 export const DoctorScheduleService = {
     insertIntoDB,
+    getAllDoctorSchedule
 }

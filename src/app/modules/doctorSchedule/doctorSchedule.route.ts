@@ -6,6 +6,15 @@ import { UserRole } from "@prisma/client";
 
 const router = express.Router();
 
+router.get(
+    "/",
+    auth(UserRole.DOCTOR), //* if user is doctor 
+    DoctorScheduleController.getAllDoctorSchedule
+)
+
+
+
+
 router.post(
     "/",
     auth(UserRole.DOCTOR), //* if user is doctor 
