@@ -15,6 +15,11 @@ router.post(
     ScheduleController.insertIntoDB
 )
 
+router.delete(
+    "/:id",
+    ScheduleController.deleteScheduleFromDB
+)
+
 
 
 
