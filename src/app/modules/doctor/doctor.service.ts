@@ -1,6 +1,10 @@
-import { Doctor, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import httpStatus from 'http-status';
+import ApiError from "../../errors/ApiError";
+import { openai } from "../../helpers/openRouter";
 import { IOptions, paginationHelper } from "../../helpers/paginationHelpers";
-import { prisma } from "../../shared/prisma"
+import { parseDoctorInfo } from "../../helpers/parseDoctorInfo";
+import { prisma } from "../../shared/prisma";
 import { doctorSearchableFields } from "./doctor.constant";
 import { IDoctorUpdateInput } from "./doctor.interface";
 
@@ -134,7 +138,76 @@ const updateIntoDb = async (id: string, payload: Partial<IDoctorUpdateInput>) =>
     })
 
 }
+
+
+
+
+
+
+const getAiSuggestion = async (payload: { symptoms: string }) => {
+    if (!(payload && payload.symptoms)) {
+        throw new ApiError(httpStatus.BAD_REQUEST, "Symptoms is required")
+    }
+    //  find doctor 
+    const doctors = await prisma.doctor.findMany({
+        where: {
+            isDeleted: false
+        },
+        include: {
+            doctorSpecialties: {
+                include: {
+                    specialities: true
+                }
+            }
+        }
+    })
+
+    // console.log("doctor data loaded............\n");
+
+    // step 2 --> copy from cheatGpt
+    const prompt = `
+You are a medical assistant AI. 
+A patient described these symptoms: "${payload.symptoms}".
+Based on the following doctors and their specialties, suggest the 3 most suitable doctors.
+
+Doctors List:
+${JSON.stringify(doctors, null, 2)}
+
+Return your answer in this format with full individual doctor data.
+`;
+
+    // console.log("analeysing ............\n");
+    // step 3 --> copy openRouter doc
+    const completion = await openai.chat.completions.create({
+        model: 'z-ai/glm-4.5-air:free',
+        messages: [
+            {
+                role: "system",
+                content:
+                    "You are an AI medical assistant. You DO NOT diagnose diseases, but you can recommend suitable doctors based on symptoms and specialties.",
+            },
+
+            {
+                role: 'user',
+                content: prompt,
+            },
+        ],
+    });
+    const messageContent = typeof completion.choices?.[0]?.message === "string"
+        ? completion.choices[0].message
+        : (completion.choices?.[0]?.message?.content ?? "");
+    const result = await parseDoctorInfo(messageContent);
+    // console.log(completion.choices[0].message.content);
+    return result;
+
+}
+
+
+
+
+
 export const DoctorService = {
     getAllFromDB,
-    updateIntoDb
+    updateIntoDb,
+    getAiSuggestion
 };

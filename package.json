@@ -23,6 +23,7 @@
     "http-status": "^2.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
+    "openai": "^6.8.1",
     "prisma": "^6.18.0",
     "zod": "^4.1.12"
   },

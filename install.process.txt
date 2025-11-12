@@ -20,3 +20,7 @@ cloudinary ---> copy cloudinary code and change key
 * format date -----> data fns
 // get schedules --> implement pagination, filtering, sorting
 // delete schedules 
+
+
+// open router ai -------> follow doc and using cheat GTP
+// Agno ai 
