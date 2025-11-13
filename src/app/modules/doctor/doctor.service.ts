@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Doctor, Prisma, UserStatus } from "@prisma/client";
 import httpStatus from 'http-status';
 import ApiError from "../../errors/ApiError";
 import { openai } from "../../helpers/openRouter";
@@ -86,9 +86,11 @@ const getAllFromDB = async (filters: any, options: IOptions) => {
     }
 };
 
-const updateIntoDb = async (id: string, payload: Partial<IDoctorUpdateInput>) => {
+const updateIntoDB = async (id: string, payload: Partial<IDoctorUpdateInput>) => {
     const doctorInfo = await prisma.doctor.findUniqueOrThrow({
-        where: { id }
+        where: {
+            id
+        }
     });
 
     const { specialties, ...doctorData } = payload;
@@ -119,8 +121,6 @@ const updateIntoDb = async (id: string, payload: Partial<IDoctorUpdateInput>) =>
 
         }
 
-        // * doctor --> doctorSpecializes --> specializes
-
         const updatedData = await tnx.doctor.update({
             where: {
                 id: doctorInfo.id
@@ -133,11 +133,78 @@ const updateIntoDb = async (id: string, payload: Partial<IDoctorUpdateInput>) =>
                     }
                 }
             }
+
+            //  doctor - doctorSpecailties - specialities 
         })
+
         return updatedData
     })
 
+
 }
+
+const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
+    const result = await prisma.doctor.findUnique({
+        where: {
+            id,
+            isDeleted: false,
+        },
+        include: {
+            doctorSpecialties: {
+                include: {
+                    specialities: true,
+                },
+            },
+            doctorSchedules: {
+                include: {
+                    schedule: true
+                }
+            }
+        },
+    });
+    return result;
+};
+
+const deleteFromDB = async (id: string): Promise<Doctor> => {
+    return await prisma.$transaction(async (transactionClient) => {
+        const deleteDoctor = await transactionClient.doctor.delete({
+            where: {
+                id,
+            },
+        });
+
+        await transactionClient.user.delete({
+            where: {
+                email: deleteDoctor.email,
+            },
+        });
+
+        return deleteDoctor;
+    });
+};
+
+const softDelete = async (id: string): Promise<Doctor> => {
+    return await prisma.$transaction(async (transactionClient) => {
+        const deleteDoctor = await transactionClient.doctor.update({
+            where: { id },
+            data: {
+                isDeleted: true,
+            },
+        });
+
+        await transactionClient.user.update({
+            where: {
+                email: deleteDoctor.email,
+            },
+            data: {
+                status: UserStatus.DELETED,
+            },
+        });
+
+        return deleteDoctor;
+    });
+};
+
 
 
 
@@ -208,6 +275,9 @@ Return your answer in this format with full individual doctor data.
 
 export const DoctorService = {
     getAllFromDB,
-    updateIntoDb,
-    getAiSuggestion
+    updateIntoDB,
+    getAiSuggestion,
+    softDelete,
+    deleteFromDB,
+    getByIdFromDB
 };

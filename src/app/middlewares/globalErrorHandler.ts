@@ -13,8 +13,8 @@ const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFun
 
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === "P2002") {
-            message = "Duplicate key error!",
-                error = err.meta
+            message = "Duplicate key error!"
+            error = err.meta
             statusCode = httpStatus.CONFLICT
         }
         if (err.code === "P1000") {
@@ -23,9 +23,14 @@ const globalErrorHandler = (err: any, req: Request, res: Response, next: NextFun
             statusCode = httpStatus.BAD_GATEWAY
         }
         if (err.code === "P2003") {
-            message = "Foreign key constraint failed",
-                error = err.message
+            message = "Foreign key constraint failed"
+            error = err.message
             statusCode = httpStatus.BAD_REQUEST
+        }
+        if (err.code === "P2025") {
+            statusCode = httpStatus.NOT_FOUND;
+            message = "No record was found for your query.";
+            error = err;
         }
     }
 
