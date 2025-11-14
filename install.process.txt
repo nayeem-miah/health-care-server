@@ -24,3 +24,8 @@ cloudinary ---> copy cloudinary code and change key
 
 // open router ai -------> follow doc and using cheat GTP
 // Agno ai 
+
+
+* payment system with stripe ------------> go to stripe website --> login --> stripe secret key--> stripe docs--> install stripe--> 
+* and cheatGpt prompt --> I want to implement a payment system with stripe for doctor appointment system give me code(ts, express, prisma, all modular pattern), stripe session.
+* verify with webhooks ------> gpt prompt --> give me stripe payment web hooks

@@ -1,3 +1,4 @@
+import { stripe } from "../../helpers/stripe";
 import { prisma } from "../../shared/prisma";
 import { IJwtPayload } from "../../types/common";
 import { v4 as uuidv4 } from 'uuid';
@@ -57,6 +58,38 @@ const createAppointment = async (user: IJwtPayload, payload: { doctorId: string,
                 transactionId
             }
         })
+
+
+        // Create Checkout Session
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+
+            mode: "payment",
+            customer_email: user.email,
+
+            line_items: [
+                {
+                    price_data: {
+                        currency: "usd",
+                        product_data: {
+                            name: `Doctor Appointment for ${doctorData.name}`,
+                        },
+                        unit_amount: doctorData.appointmentFee * 100,
+                    },
+                    quantity: 1,
+                },
+            ],
+
+            // metadata: {
+            //     appointmentId: appointment.id,
+            //     patientName: appointment.patientName,
+            //     email: appointment.email,
+            // },
+
+            success_url: `https://nayeem-miah.vercel.app`,
+            cancel_url: `https://docs.stripe.com/`,
+        });
+        console.log(session);
 
         return appointmentData
 

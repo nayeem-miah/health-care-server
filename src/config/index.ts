@@ -17,6 +17,7 @@ export default {
         access_token_secret: process.env.JWT_ACCESS_TOKEN_SECRET,
         refresh_token_secret: process.env.JWT_REFRESH_TOKEN_SECRET
     },
-    openRouterApiKey: process.env.OPEN_ROUTER_API_KEY
-
+    openRouterApiKey: process.env.OPEN_ROUTER_API_KEY,
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY,
+    stripeWebHookSecret: process.env.STRIPE_WEBHOOK_SECRET,
 }
