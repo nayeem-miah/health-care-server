@@ -21,11 +21,35 @@ cloudinary ---> copy cloudinary code and change key
 // get schedules --> implement pagination, filtering, sorting
 // delete schedules 
 
-
+-----------------------------------------------------------------------
 // open router ai -------> follow doc and using cheat GTP
 // Agno ai 
 
-
+-------------------------------------------------------------------------
 * payment system with stripe ------------> go to stripe website --> login --> stripe secret key--> stripe docs--> install stripe--> 
 * and cheatGpt prompt --> I want to implement a payment system with stripe for doctor appointment system give me code(ts, express, prisma, all modular pattern), stripe session.
 * verify with webhooks ------> gpt prompt --> give me stripe payment web hooks
+
+*webhooks cli locally install -------->login ----> stripe listen --forward-to localhost:5000/webhook
+
+// update payment status and appointment status
+
+
+
+
+
+*stripe event
+
+
+
+
+
+
+
+
+
+
+
+
+
+pg_ctl -D "C:\Program Files\PostgreSQL\18\data" start

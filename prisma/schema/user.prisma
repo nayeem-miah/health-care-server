@@ -45,10 +45,10 @@ model Doctor {
   isDeleted           Boolean             @default(false)
   createdAt           DateTime            @default(now())
   updatedAt           DateTime            @updatedAt
-  user                User                @relation(fields: [email], references: [email])
+  appointments        Appointment[]
   doctorSchedules     DoctorSchedules[]
   doctorSpecialties   DoctorSpecialties[]
-  appointments        Appointment[]
+  user                User                @relation(fields: [email], references: [email])
   prescription        Prescription[]
 
   @@map("doctors")
@@ -63,8 +63,8 @@ model Patient {
   isDeleted     Boolean        @default(false)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
-  user          User           @relation(fields: [email], references: [email])
   appointments  Appointment[]
+  user          User           @relation(fields: [email], references: [email])
   prescriptions Prescription[]
 
   @@map("patients")

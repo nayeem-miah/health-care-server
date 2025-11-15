@@ -51,7 +51,7 @@ const createAppointment = async (user: IJwtPayload, payload: { doctorId: string,
 
         const transactionId = uuidv4();
 
-        await tnx.payment.create({
+        const paymentData = await tnx.payment.create({
             data: {
                 appointmentId: appointmentData.id,
                 amount: doctorData.appointmentFee,
@@ -80,18 +80,18 @@ const createAppointment = async (user: IJwtPayload, payload: { doctorId: string,
                 },
             ],
 
-            // metadata: {
-            //     appointmentId: appointment.id,
-            //     patientName: appointment.patientName,
-            //     email: appointment.email,
-            // },
+            metadata: {
+                appointmentId: appointmentData.id,
+                paymentId: paymentData.id,
+            },
 
             success_url: `https://nayeem-miah.vercel.app`,
             cancel_url: `https://docs.stripe.com/`,
         });
-        console.log(session);
 
-        return appointmentData
+        // console.log(session);
+
+        return { paymentUrl: session.url }
 
     })
     return result
