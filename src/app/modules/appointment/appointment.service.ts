@@ -1,3 +1,5 @@
+import { Prisma, UserRole } from "@prisma/client";
+import { IOptions, paginationHelper } from "../../helpers/paginationHelpers";
 import { stripe } from "../../helpers/stripe";
 import { prisma } from "../../shared/prisma";
 import { IJwtPayload } from "../../types/common";
@@ -97,9 +99,119 @@ const createAppointment = async (user: IJwtPayload, payload: { doctorId: string,
     return result
 };
 
+const getMyAppointment = async (user: IJwtPayload, filters: any, options: IOptions) => {
+    const { page, limit, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(options);
+    const { ...filterData } = filters;
+
+    const andConditions: Prisma.AppointmentWhereInput[] = []
+
+    if (user.role === UserRole.PATIENT) {
+        andConditions.push({
+            patient: {
+                email: user.email
+            }
+        })
+    } else if (user.role === UserRole.DOCTOR) {
+        andConditions.push({
+            doctor: {
+                email: user.email
+            }
+        })
+    }
+
+    // filtering
+    if (Object.keys(filterData).length > 0) {
+        const filterConditions = Object.keys(filterData).map(key => ({
+            [key]: {
+                equals: (filterData as any)[key]
+            }
+        }))
+        andConditions.push(...filterConditions)
+    }
+
+    const whereConditions: Prisma.AppointmentWhereInput = andConditions.length > 0 ? { AND: andConditions } : {}
+
+    const result = await prisma.appointment.findMany({
+        where: whereConditions,
+        skip,
+        take: limit,
+        orderBy: {
+            [sortBy]: sortOrder
+        },
+        include: user.role === UserRole.DOCTOR ?
+            { patient: true } : { doctor: true }
+    });
+
+    const total = await prisma.appointment.count({
+        where: whereConditions
+    });
+
+    return {
+        meta: {
+            total,
+            limit,
+            page
+        },
+        data: result
+    }
+
+}
+
+const getAllAppointment = async (user: IJwtPayload, filters: any, options: IOptions) => {
+    const { page, limit, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(options);
+    const { ...filterData } = filters;
+
+    const andConditions: Prisma.AppointmentWhereInput[] = []
+
+
+    // filtering
+    if (Object.keys(filterData).length > 0) {
+        const filterConditions = Object.keys(filterData).map(key => ({
+            [key]: {
+                equals: (filterData as any)[key]
+            }
+        }))
+        andConditions.push(...filterConditions)
+    }
+
+    const whereConditions: Prisma.AppointmentWhereInput = andConditions.length > 0 ? { AND: andConditions } : {}
+
+    const result = await prisma.appointment.findMany({
+        where: whereConditions,
+        skip,
+        take: limit,
+        orderBy: {
+            [sortBy]: sortOrder
+        },
+        include: {
+            doctor: true,
+            patient: true,
+            schedule: true,
+            payment: true,
+            prescription: true,
+        }
+    });
+
+
+    const total = await prisma.appointment.count({
+        where: whereConditions
+    });
+
+    return {
+        meta: {
+            total,
+            limit,
+            page
+        },
+        data: result
+    }
+
+}
 
 
 
 export const AppointmentService = {
-    createAppointment
+    createAppointment,
+    getMyAppointment,
+    getAllAppointment,
 }

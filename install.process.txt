@@ -34,6 +34,7 @@ cloudinary ---> copy cloudinary code and change key
 
 // update payment status and appointment status
 
+payment working flow ------> init payment ---> stripe -----> payment url------> stripe make payment -------> webhook-------> verify sign-----------> update status
 
 
 
@@ -41,6 +42,7 @@ cloudinary ---> copy cloudinary code and change key
 *stripe event
 
 
+// get my appointment
 
 
 
