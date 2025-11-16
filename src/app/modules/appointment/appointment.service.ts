@@ -1,9 +1,11 @@
-import { Prisma, UserRole } from "@prisma/client";
+import httpStatus from 'http-status';
+import { AppointmentStatus, Prisma, UserRole } from "@prisma/client";
 import { IOptions, paginationHelper } from "../../helpers/paginationHelpers";
 import { stripe } from "../../helpers/stripe";
 import { prisma } from "../../shared/prisma";
 import { IJwtPayload } from "../../types/common";
 import { v4 as uuidv4 } from 'uuid';
+import ApiError from "../../errors/ApiError";
 
 const createAppointment = async (user: IJwtPayload, payload: { doctorId: string, scheduleId: string }) => {
     const patientData = await prisma.patient.findUniqueOrThrow({
@@ -157,42 +159,61 @@ const getMyAppointment = async (user: IJwtPayload, filters: any, options: IOptio
 
 }
 
-const getAllAppointment = async (user: IJwtPayload, filters: any, options: IOptions) => {
-    const { page, limit, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(options);
-    const { ...filterData } = filters;
 
-    const andConditions: Prisma.AppointmentWhereInput[] = []
+const getAllFromDB = async (
+    filters: any,
+    options: IOptions
+) => {
+    const { limit, page, skip } = paginationHelper.calculatePagination(options);
+    const { patientEmail, doctorEmail, ...filterData } = filters;
+    const andConditions = [];
 
-
-    // filtering
-    if (Object.keys(filterData).length > 0) {
-        const filterConditions = Object.keys(filterData).map(key => ({
-            [key]: {
-                equals: (filterData as any)[key]
+    if (patientEmail) {
+        andConditions.push({
+            patient: {
+                email: patientEmail
             }
-        }))
-        andConditions.push(...filterConditions)
+        })
+    }
+    else if (doctorEmail) {
+        andConditions.push({
+            doctor: {
+                email: doctorEmail
+            }
+        })
     }
 
-    const whereConditions: Prisma.AppointmentWhereInput = andConditions.length > 0 ? { AND: andConditions } : {}
+    if (Object.keys(filterData).length > 0) {
+        andConditions.push({
+            AND: Object.keys(filterData).map((key) => {
+                return {
+                    [key]: {
+                        equals: (filterData as any)[key]
+                    }
+                };
+            })
+        });
+    }
+
+    // console.dir(andConditions, { depth: Infinity })
+    const whereConditions: Prisma.AppointmentWhereInput =
+        andConditions.length > 0 ? { AND: andConditions } : {};
 
     const result = await prisma.appointment.findMany({
         where: whereConditions,
         skip,
         take: limit,
-        orderBy: {
-            [sortBy]: sortOrder
-        },
+        orderBy:
+            options.sortBy && options.sortOrder
+                ? { [options.sortBy]: options.sortOrder }
+                : {
+                    createdAt: 'desc',
+                },
         include: {
             doctor: true,
-            patient: true,
-            schedule: true,
-            payment: true,
-            prescription: true,
+            patient: true
         }
     });
-
-
     const total = await prisma.appointment.count({
         where: whereConditions
     });
@@ -200,18 +221,46 @@ const getAllAppointment = async (user: IJwtPayload, filters: any, options: IOpti
     return {
         meta: {
             total,
+            page,
             limit,
-            page
         },
-        data: result
+        data: result,
+    };
+};
+
+const updateAppointmentStatus = async (appointmentId: string, status: AppointmentStatus, user: IJwtPayload) => {
+    const appointmentData = await prisma.appointment.findUniqueOrThrow({
+        where: {
+            id: appointmentId
+        },
+        include: {
+            doctor: true
+        }
+    });
+
+    if (user.role === UserRole.DOCTOR) {
+        if (!(user.email === appointmentData.doctor.email)) {
+            throw new ApiError(httpStatus.BAD_REQUEST, "This is not your appointment")
+        }
     }
 
+
+    return prisma.appointment.update({
+        where: {
+            id: appointmentId
+        },
+        data: {
+            status
+        }
+    })
+
+
+
 }
-
-
 
 export const AppointmentService = {
     createAppointment,
     getMyAppointment,
-    getAllAppointment,
+    getAllFromDB,
+    updateAppointmentStatus
 }

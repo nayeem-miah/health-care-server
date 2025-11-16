@@ -9,7 +9,7 @@ const router = express.Router();
 router.get(
     "/",
     auth(UserRole.ADMIN),
-    AppointmentController.getAllAppointment
+    AppointmentController.getAllFromDB
 );
 
 
@@ -20,12 +20,16 @@ router.get(
     AppointmentController.getMyAppointment
 );
 
-
-
 router.post(
     '/',
     auth(UserRole.PATIENT),
     AppointmentController.createAppointment
+);
+
+router.patch(
+    '/status/:id',
+    auth(UserRole.ADMIN, UserRole.DOCTOR),
+    AppointmentController.updateAppointmentStatus
 )
 
 export const AppointmentRoutes = router;

@@ -4,6 +4,7 @@ import { AppointmentService } from "./appointment.service"
 import sendResponse from "../../shared/sendResponse";
 import { IJwtPayload } from "../../types/common";
 import pick from "../../helpers/pick";
+import { appointmentFilterableFields } from "./appointment.constant";
 
 const createAppointment = catchAsync(async (req: Request & { user?: IJwtPayload }, res: Response) => {
     const user = req.user;
@@ -22,27 +23,42 @@ const getMyAppointment = catchAsync(async (req: Request & { user?: IJwtPayload }
     const filters = pick(req.query, ["status", "paymentStatus"])
     const user = req.user;
 
-    const result = await AppointmentService.getAllAppointment(user as IJwtPayload, filters, options);
-
-    sendResponse(res, {
-        statusCode: 200,
-        success: true,
-        message: "Appointment recived successfully",
-        data: result
-    })
-})
-
-const getAllAppointment = catchAsync(async (req: Request & { user?: IJwtPayload }, res: Response) => {
-    const options = pick(req.query, ["page", "limit", "sortBy", "sortOrder"]);
-    const filters = pick(req.query, ["status", "paymentStatus"])
-    const user = req.user;
-
     const result = await AppointmentService.getMyAppointment(user as IJwtPayload, filters, options);
 
     sendResponse(res, {
         statusCode: 200,
         success: true,
-        message: "Appointment get successfully",
+        message: "Appointment recived successfully",
+        meta: result.meta,
+        data: result.data
+    })
+})
+
+
+const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
+    const filters = pick(req.query, appointmentFilterableFields)
+    const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+    const result = await AppointmentService.getAllFromDB(filters, options);
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Appointment retrieval successfully',
+        meta: result.meta,
+        data: result.data,
+    });
+});
+
+const updateAppointmentStatus = catchAsync(async (req: Request & { user?: IJwtPayload }, res: Response) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    const user = req.user
+
+    const result = await AppointmentService.updateAppointmentStatus(id, status, user as IJwtPayload);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Appointment updated successfully",
         data: result
     })
 })
@@ -53,5 +69,6 @@ const getAllAppointment = catchAsync(async (req: Request & { user?: IJwtPayload 
 export const AppointmentController = {
     createAppointment,
     getMyAppointment,
-    getAllAppointment,
+    getAllFromDB,
+    updateAppointmentStatus,
 }
