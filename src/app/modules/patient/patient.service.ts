@@ -150,14 +150,11 @@ const updateIntoDB = async (user: IJwtPayload, payload: any) => {
             },
             include: {
                 patientHealthData: true,
-                // medicalReports: true
+                medicalReport: true
             }
         })
         return result;
     })
-
-
-
 }
 
 export const PatientService = {
