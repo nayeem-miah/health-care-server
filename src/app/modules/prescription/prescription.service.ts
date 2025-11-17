@@ -40,34 +40,45 @@ const createPrescription = async (user: IJwtPayload, payload: Partial<Prescripti
 };
 
 //? get my prescription as a patient
-const getMyPrescription = async (user: IJwtPayload, filters: any, options: IOptions) => {
-    const { page, limit, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(options);
-    const { ...filterData } = filters;
+const getMyPrescription = async (user: IJwtPayload, options: IOptions) => {
+    const { limit, page, skip, sortBy, sortOrder } = paginationHelper.calculatePagination(options);
 
-    const andConditions: Prisma.PrescriptionWhereInput[] = [];
-
-    const patientData = await prisma.patient.findUniqueOrThrow({
+    const result = await prisma.prescription.findMany({
         where: {
-            email: user.email
+            patient: {
+                email: user.email
+            }
+        },
+        skip,
+        take: limit,
+        orderBy: {
+            [sortBy]: sortOrder
+        },
+        include: {
+            doctor: true,
+            patient: true,
+            appointment: true
         }
     })
 
-    if (user.role === UserRole.PATIENT && patientData) {
-        if (user.email === patientData.email) {
-            const result = await prisma.prescription.findMany({
-                where: {
-                    patientId: patientData.id
-                },
-                include: {
-                    doctor: true,
-                    patient: true
-                }
-            })
-
-            return result
+    const total = await prisma.prescription.count({
+        where: {
+            patient: {
+                email: user.email
+            }
         }
+    })
+
+    return {
+        meta: {
+            total,
+            page,
+            limit
+        },
+        data: result
     }
-}
+
+};
 
 export const PrescriptionService = {
     createPrescription,
