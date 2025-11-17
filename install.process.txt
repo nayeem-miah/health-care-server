@@ -42,7 +42,18 @@ payment working flow ------> init payment ---> stripe -----> payment url------> 
 *stripe event
 
 
-// get my appointment
+// get my appointment by email
+// get all appointment by admin
+
+
+ // create prescription --> doctor
+ // get my prescription --> patient
+
+ // create patientHealthData
+ // create patientHealthData
+ 
+ // create review ----> patient one to one
+ 
 
 
 

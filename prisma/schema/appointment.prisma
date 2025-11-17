@@ -13,7 +13,7 @@ model Appointment {
   schedule       Schedule          @relation(fields: [scheduleId], references: [id])
   payment        Payment?
   prescription   Prescription?
-  review         Review[]
+  review         Review?
 
   @@map("appointments")
 }
@@ -54,10 +54,12 @@ model Review {
   patient       Patient     @relation(fields: [patientId], references: [id])
   doctorId      String
   doctor        Doctor      @relation(fields: [doctorId], references: [id])
-  appointmentId String
+  appointmentId String      @unique
   appointment   Appointment @relation(fields: [appointmentId], references: [id])
   rating        Int
   comment       String?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+
+  @@map("review")
 }
