@@ -67,6 +67,11 @@ const getAllFromDB = async (filters: any, options: IOptions) => {
                 include: {
                     specialities: true
                 }
+            },
+            review: {
+                select: {
+                    rating: true
+                }
             }
         }
     });
@@ -159,7 +164,8 @@ const getByIdFromDB = async (id: string): Promise<Doctor | null> => {
                 include: {
                     schedule: true
                 }
-            }
+            },
+            review: true
         },
     });
     return result;
@@ -204,9 +210,6 @@ const softDelete = async (id: string): Promise<Doctor> => {
         return deleteDoctor;
     });
 };
-
-
-
 
 
 
