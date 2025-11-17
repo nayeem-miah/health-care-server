@@ -38,7 +38,9 @@ const getMyAppointment = catchAsync(async (req: Request & { user?: IJwtPayload }
 const getAllFromDB = catchAsync(async (req: Request, res: Response) => {
     const filters = pick(req.query, appointmentFilterableFields)
     const options = pick(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
+
     const result = await AppointmentService.getAllFromDB(filters, options);
+
     sendResponse(res, {
         statusCode: 200,
         success: true,

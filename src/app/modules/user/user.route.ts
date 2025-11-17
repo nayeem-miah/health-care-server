@@ -13,6 +13,12 @@ router.get(
     UserController.getAllFRomDB
 )
 
+router.get(
+    "/me",
+    auth(UserRole.ADMIN, UserRole.PATIENT, UserRole.DOCTOR),
+    UserController.getMeProfile
+)
+
 router.post(
     "/create-patient",
     fileUploader.upload.single("file"), // uploading file
@@ -44,5 +50,10 @@ router.post(
     }
 )
 
+router.patch(
+    "/:id/status",
+    auth(UserRole.ADMIN),
+    UserController.changeProfileStatus
+)
 
 export const userRoutes = router;

@@ -3,9 +3,10 @@ import { Request } from "express";
 import config from "../../../config";
 import { fileUploader } from "../../helpers/fileUpload";
 import { prisma } from "../../shared/prisma";
-import { Admin, Doctor, Prisma, UserRole } from "@prisma/client";
+import { Admin, Doctor, Prisma, UserRole, UserStatus } from "@prisma/client";
 import { IOptions, paginationHelper } from "../../helpers/paginationHelpers";
 import { userSearchableFields } from "./user.constant";
+import { IJwtPayload } from "../../types/common";
 
 
 const createPatient = async (req: Request) => {
@@ -156,10 +157,76 @@ const getAllFRomDB = async (params: any, options: IOptions) => {
     }
 }
 
+const getMeProfile = async (user: IJwtPayload) => {
+
+    const userInfo = await prisma.user.findUniqueOrThrow({
+        where: {
+            email: user.email,
+            status: UserStatus.ACTIVE
+        },
+        select: {
+            id: true,
+            email: true,
+            needPasswordChange: true,
+            role: true,
+            status: true,
+        },
+
+    });
+
+    let profileData;
+
+    if (userInfo.role === UserRole.PATIENT) {
+        profileData = await prisma.patient.findUniqueOrThrow({
+            where: {
+                email: user.email
+            }
+        })
+    }
+    else if (userInfo.role === UserRole.DOCTOR) {
+        profileData = await prisma.doctor.findUniqueOrThrow({
+            where: {
+                email: user.email
+            }
+        })
+    }
+    else if (userInfo.role === UserRole.ADMIN) {
+        profileData = await prisma.admin.findUniqueOrThrow({
+            where: {
+                email: user.email
+            }
+        })
+    }
+
+    return {
+        ...userInfo,
+        ...profileData
+    }
+};
+
+
+const changeProfileStatus = async (id: string, payload: { status: UserStatus }) => {
+    const userData = await prisma.user.findUniqueOrThrow({
+        where: {
+            id
+        }
+    });
+
+    const updateUserStatus = await prisma.user.update({
+        where: {
+            id
+        },
+        data: payload
+    })
+
+    return updateUserStatus;
+}
 
 export const UserService = {
     createPatient,
     createAdmin,
     createDoctor,
     getAllFRomDB,
+    getMeProfile,
+    changeProfileStatus
 }

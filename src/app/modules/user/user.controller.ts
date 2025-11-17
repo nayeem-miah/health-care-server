@@ -4,6 +4,7 @@ import { UserService } from "./user.service";
 import sendResponse from "../../shared/sendResponse";
 import pick from "../../helpers/pick";
 import { userFilterableFields } from "./user.constant";
+import { IJwtPayload } from "../../types/common";
 
 
 const createPatient = catchAsync(async (req: Request, res: Response) => {
@@ -57,11 +58,39 @@ const getAllFRomDB = catchAsync(async (req: Request, res: Response) => {
     })
 })
 
+// *get me 
+const getMeProfile = catchAsync(async (req: Request & { user?: IJwtPayload }, res: Response) => {
+    const user = req.user
+    const result = await UserService.getMeProfile(user as IJwtPayload);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "get user successfully",
+        data: result,
+    })
+});
+
+const changeProfileStatus = catchAsync(async (req: Request & { user?: IJwtPayload }, res: Response) => {
+    const { id } = req.params
+    const result = await UserService.changeProfileStatus(id, req.body);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: "Change user profile status successfully",
+        data: result,
+    })
+});
+
+
 
 
 export const UserController = {
     createPatient,
     createAdmin,
     createDoctor,
-    getAllFRomDB
+    getAllFRomDB,
+    getMeProfile,
+    changeProfileStatus
 }
