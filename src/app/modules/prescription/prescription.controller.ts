@@ -17,7 +17,8 @@ const getMyPrescription = catchAsync(async (req: Request & { user?: IJwtPayload 
         statusCode: 201,
         success: true,
         message: "Prescription create successfully",
-        data: result
+        meta: result.meta,
+        data: result.data
     })
 });
 
