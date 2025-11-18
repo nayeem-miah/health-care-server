@@ -55,7 +55,7 @@ payment working flow ------> init payment ---> stripe -----> payment url------> 
  // create review ----> patient one to one
 
 
- 
+  // timeing -----> node cron
 
 
 
