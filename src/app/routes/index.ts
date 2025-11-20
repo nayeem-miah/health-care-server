@@ -1,14 +1,15 @@
 import express from 'express';
-import { userRoutes } from '../modules/user/user.route';
-import { authRoutes } from '../modules/auth/auth.route';
-import { ScheduleRouter } from '../modules/schedule/schedule.route';
-import { doctorScheduleRoute } from '../modules/doctorSchedule/doctorSchedule.route';
-import { SpecialtiesRoutes } from '../modules/specialties/specialties.route';
-import { DoctorRoutes } from '../modules/doctor/doctor.route';
 import { AppointmentRoutes } from '../modules/appointment/appointment.route';
+import { authRoutes } from '../modules/auth/auth.route';
+import { DoctorRoutes } from '../modules/doctor/doctor.route';
+import { doctorScheduleRoute } from '../modules/doctorSchedule/doctorSchedule.route';
+import { MetaRoutes } from '../modules/meta/meta.route';
+import { PatientRoutes } from '../modules/patient/patient.route';
 import { PrescriptionRoutes } from '../modules/prescription/prescription.route';
 import { ReviewRoutes } from '../modules/review/review.route';
-import { PatientRoutes } from '../modules/patient/patient.route';
+import { ScheduleRouter } from '../modules/schedule/schedule.route';
+import { SpecialtiesRoutes } from '../modules/specialties/specialties.route';
+import { userRoutes } from '../modules/user/user.route';
 
 
 const router = express.Router();
@@ -53,6 +54,10 @@ const moduleRoutes = [
     {
         path: "/review",
         route: ReviewRoutes
+    },
+    {
+        path: "/metadata",
+        route: MetaRoutes
     },
 ];
 

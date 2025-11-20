@@ -55,7 +55,7 @@ payment working flow ------> init payment ---> stripe -----> payment url------> 
  // create review ----> patient one to one
 
 
-  // timeing -----> node cron -------> running server and check every appointment 30 min and delete
+// node-cron: check and delete expired appointments every 30 minutes
 
 
 
