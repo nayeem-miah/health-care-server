@@ -5,7 +5,8 @@ import { MetaService } from "./meta.service";
 import { IJwtPayload } from "../../types/common";
 
 const fetchDashboardMetaData = catchAsync(async (req: Request & { user?: IJwtPayload }, res: Response) => {
-    const user = req.user
+    const user = req.user;
+
     const result = await MetaService.fetchDashboardMetaData(user as IJwtPayload);
 
     sendResponse(res, {
