@@ -57,7 +57,8 @@ payment working flow ------> init payment ---> stripe -----> payment url------> 
 
 // node-cron: check and delete expired appointments every 30 minutes
 
-
+// GET METADATA  ---------API,
+RAW query -----------> prisma.$queryRaw`
 
 
 

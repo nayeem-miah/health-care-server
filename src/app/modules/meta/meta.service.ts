@@ -40,9 +40,19 @@ const getAdminMetaData = async () => {
         where: {
             status: PaymentStatus.PAID
         }
-    })
+    });
+}
 
+const getBarChartData = async () => {
+    const appointmentCountPerMonth = prisma.$queryRaw`
+    SELECT DATE_TRUNC('month', "createdAt") AS month,
+    CAST(COUNT(*) as INTEGER) AS count
+    FROM "appointments"
+    GROUP BY month
+    ORDER BY month ASC
+    `
 
+    return appointmentCountPerMonth
 }
 
 
