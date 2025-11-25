@@ -60,6 +60,8 @@ payment working flow ------> init payment ---> stripe -----> payment url------> 
 // GET METADATA  ---------API,
 RAW query -----------> prisma.$queryRaw`
 
+Rate Limiting   
+
 
 
 
