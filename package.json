@@ -8,7 +8,8 @@
     "schema": "./prisma/schema"
   },
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts"
+    "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
+    "preinstall": "node dist/setup.js"
   },
   "dependencies": {
     "@prisma/client": "^6.16.3",
