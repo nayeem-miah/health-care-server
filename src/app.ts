@@ -43,6 +43,7 @@ cron.schedule('* * * * *', () => {
 app.use('/api/v1', router);
 
 app.get('/', (req: Request, res: Response) => {
+    console.log(req.socket.remoteAddress); // device ip
     res.send({
         success: true,
         message: "health care server is running..",
